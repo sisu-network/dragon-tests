@@ -2,7 +2,6 @@ package tests
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"math/big"
 	"time"
@@ -12,7 +11,7 @@ import (
 	"github.com/sisu-network/dragon-tests/utils"
 )
 
-func TestChangeName() {
+func TestChangeName(title string) {
 	fromAccount := localAccounts[0]
 	privateKey, err := localWallet.PrivateKey(fromAccount)
 	if err != nil {
@@ -58,9 +57,8 @@ func TestChangeName() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Tx = ", tx.Hash())
 
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 1)
 
 	receipt, err := client.TransactionReceipt(context.Background(), tx.Hash())
 	if err != nil {
@@ -68,5 +66,5 @@ func TestChangeName() {
 	}
 	utils.Assert(receipt.Status, uint64(1), "Transaction should be successful")
 
-	fmt.Println("Test Passed")
+	utils.MarkTestPassed(title)
 }

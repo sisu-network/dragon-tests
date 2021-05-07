@@ -26,3 +26,7 @@ func Assert(expected interface{}, actual interface{}, message string) {
 		panic(message)
 	}
 }
+
+func MarkTestPassed(title string) {
+	fmt.Println("\""+title+"\"", "passed")
+}
