@@ -11,6 +11,10 @@ import (
 	"github.com/sisu-network/dragon-tests/utils"
 )
 
+var (
+	chainId = big.NewInt(1)
+)
+
 func TestChangeName(title string) {
 	fromAccount := localAccounts[0]
 	privateKey, err := localWallet.PrivateKey(fromAccount)
@@ -28,7 +32,11 @@ func TestChangeName(title string) {
 		log.Fatal(err)
 	}
 
-	auth := bind.NewKeyedTransactor(privateKey)
+	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainId)
+	if err != nil {
+		panic(err)
+	}
+
 	auth.Nonce = big.NewInt(int64(nonce))
 	auth.Value = big.NewInt(0)     // in wei
 	auth.GasLimit = uint64(300000) // in units
