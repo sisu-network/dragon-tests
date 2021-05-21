@@ -54,7 +54,7 @@ func transfer(fromAccount accounts.Account, toAddress accounts.Account, amount *
 }
 
 // Tests
-func TestConcurrentTransfers(title string) {
+func testConcurrentTransfer(title string) {
 	recipient := localAccounts[0]
 	wg := &sync.WaitGroup{}
 
@@ -88,4 +88,11 @@ func TestConcurrentTransfers(title string) {
 	assert.Equal(expectedResult, diff, "The balance difference should be correct")
 
 	utils.MarkTestPassed(title)
+}
+
+func TestConcurrentTransfers(title string, round int) {
+	for i := 0; i < round; i++ {
+		testConcurrentTransfer(title)
+		time.Sleep(time.Second * 2)
+	}
 }
