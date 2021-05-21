@@ -334,18 +334,21 @@ func diff(expected interface{}, actual interface{}) string {
 // cannot be determined and will always fail.
 func Equal(expected, actual interface{}, msgAndArgs ...interface{}) bool {
 	if err := validateEqualArgs(expected, actual); err != nil {
-		return Fail(fmt.Sprintf("Invalid operation: %#v == %#v (%s)",
-			expected, actual, err), msgAndArgs...)
+		msg := fmt.Sprintf("Invalid operation: %#v == %#v (%s)\n %s",
+			expected, actual, err, msgAndArgs)
+		panic(errors.New(msg))
 	}
 
 	if !ObjectsAreEqual(expected, actual) {
 		diff := diff(expected, actual)
 		expected, actual = formatUnequalValues(expected, actual)
-		return Fail(fmt.Sprintf("Not equal: \n"+
+		msg := fmt.Sprintf("Not equal: \n"+
 			"expected: %s\n"+
-			"actual  : %s%s", expected, actual, diff), msgAndArgs...)
+			"actual  : %s%s\n"+
+			"%s", expected, actual, diff, msgAndArgs)
+
+		panic(errors.New(msg))
 	}
 
 	return true
-
 }

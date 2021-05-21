@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"fmt"
 	"math/big"
 	"sync"
 	"time"
@@ -22,8 +23,22 @@ func transfer(fromAccount accounts.Account, toAddress accounts.Account, amount *
 	gasPrice := big.NewInt(75)
 
 	var data []byte
-	tx := types.NewTransaction(nonce, toAddress.Address, amount, gasLimit, gasPrice, data)
-	signedTx, err := localWallet.SignTx(fromAccount, tx, nil)
+	txData := &types.AccessListTx{
+		ChainID:  chainId,
+		Nonce:    nonce,
+		To:       &toAddress.Address,
+		Value:    amount,
+		Gas:      gasLimit,
+		GasPrice: gasPrice,
+		Data:     data,
+	}
+
+	prvKey, err := localWallet.PrivateKey(fromAccount)
+	if err != nil {
+		panic(err)
+	}
+
+	signedTx, err := types.SignNewTx(prvKey, types.NewEIP2930Signer(chainId), txData)
 	if err != nil {
 		panic(err)
 	}
@@ -48,7 +63,8 @@ func TestConcurrentTransfers(title string) {
 		panic(err)
 	}
 
-	amount := utils.ONE_ETHER.Div(utils.ONE_ETHER, big.NewInt(100)) // 0.01 ether
+	amount := new(big.Int).Set(utils.ONE_ETHER)
+	amount = amount.Div(utils.ONE_ETHER, big.NewInt(100)) // 0.01 ether
 	for i := 1; i < 10; i++ {
 		wg.Add(1)
 		go func(account accounts.Account) {
@@ -58,11 +74,13 @@ func TestConcurrentTransfers(title string) {
 
 	wg.Wait()
 
-	time.Sleep(time.Second) // Wait for block finality
+	time.Sleep(time.Second * 1) // Wait for block finality
 	afterBalance, err := client.BalanceAt(context.Background(), recipient.Address, nil)
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println("afterBalance = ", afterBalance)
 
 	diff := afterBalance.Sub(afterBalance, beforeBalance)
 	// Diff should be 0.09 ether
