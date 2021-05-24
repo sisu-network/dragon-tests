@@ -8,54 +8,13 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/sisu-network/dragon-tests/assert"
 	"github.com/sisu-network/dragon-tests/utils"
 )
 
-func transfer(fromAccount accounts.Account, toAddress accounts.Account, amount *big.Int, wg *sync.WaitGroup) {
-	nonce, err := client.NonceAt(context.Background(), fromAccount.Address, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	gasLimit := uint64(210000) // in units
-	gasPrice := big.NewInt(75)
-
-	var data []byte
-	txData := &types.AccessListTx{
-		ChainID:  chainId,
-		Nonce:    nonce,
-		To:       &toAddress.Address,
-		Value:    amount,
-		Gas:      gasLimit,
-		GasPrice: gasPrice,
-		Data:     data,
-	}
-
-	prvKey, err := localWallet.PrivateKey(fromAccount)
-	if err != nil {
-		panic(err)
-	}
-
-	signedTx, err := types.SignNewTx(prvKey, types.NewEIP2930Signer(chainId), txData)
-	if err != nil {
-		panic(err)
-	}
-
-	err = client.SendTransaction(context.Background(), signedTx)
-	if err != nil {
-		panic(err)
-	}
-
-	if wg != nil {
-		wg.Done()
-	}
-}
-
 // Tests
 func testConcurrentTransfer(title string) {
-	recipient := localAccounts[0]
+	recipient := defaultAccounts[0]
 	wg := &sync.WaitGroup{}
 
 	beforeBalance, err := client.BalanceAt(context.Background(), recipient.Address, nil)
@@ -69,7 +28,7 @@ func testConcurrentTransfer(title string) {
 		wg.Add(1)
 		go func(account accounts.Account) {
 			transfer(account, recipient, amount, wg)
-		}(localAccounts[i])
+		}(defaultAccounts[i])
 	}
 
 	wg.Wait()

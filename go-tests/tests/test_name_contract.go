@@ -2,7 +2,7 @@ package tests
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"math/big"
 	"time"
 
@@ -16,37 +16,21 @@ var (
 )
 
 func TestChangeName(title string) {
-	fromAccount := localAccounts[0]
-	privateKey, err := localWallet.PrivateKey(fromAccount)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	nonce, err := client.NonceAt(context.Background(), fromAccount.Address, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	gasPrice, err := client.SuggestGasPrice(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainId)
-	if err != nil {
-		panic(err)
-	}
-
-	auth.Nonce = big.NewInt(int64(nonce))
-	auth.Value = big.NewInt(0)     // in wei
-	auth.GasLimit = uint64(300000) // in units
-	auth.GasPrice = gasPrice
+	fromAccount, auth := getBasicInfo()
 
 	_, tx, instance, err := name.DeployName(auth, client)
 	if err != nil {
 		panic(err)
 	}
-	_, err = bind.WaitDeployed(context.Background(), client, tx)
+
+	time.Sleep(time.Second * 2)
+
+	contractAddress, err := bind.WaitDeployed(context.Background(), client, tx)
+	fmt.Println("contractAddress = ", contractAddress)
+
+	if err != nil {
+		panic(err)
+	}
 
 	// Get the name.
 	callOpts := &bind.CallOpts{Context: context.Background(), Pending: false}
@@ -58,7 +42,7 @@ func TestChangeName(title string) {
 	utils.Assert("Hello", name, "name is correct")
 
 	// Set name
-	nonce, err = client.NonceAt(context.Background(), fromAccount.Address, nil)
+	nonce, err := client.NonceAt(context.Background(), fromAccount.Address, nil)
 	auth.Nonce = big.NewInt(int64(nonce))
 
 	tx, err = instance.SetName(auth, "NewName")

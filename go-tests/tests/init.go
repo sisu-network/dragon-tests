@@ -12,9 +12,9 @@ import (
 const LOCALHOST_MNEMONIC = "draft attract behave allow rib raise puzzle frost neck curtain gentle bless letter parrot hold century diet budget paper fetch hat vanish wonder maximum"
 
 var (
-	localAccounts []accounts.Account
-	localWallet   *hdwallet.Wallet
-	client        *ethclient.Client
+	defaultAccounts []accounts.Account
+	localWallet     *hdwallet.Wallet
+	client          *ethclient.Client
 )
 
 func init() {
@@ -25,22 +25,30 @@ func init() {
 	}
 
 	fmt.Println("Creating an account....")
-	createAccounts()
+	localWallet, err = hdwallet.NewFromMnemonic(LOCALHOST_MNEMONIC)
+	defaultAccounts = createAccounts(LOCALHOST_MNEMONIC, 10)
+	fmt.Println("Done Creating an account....")
 }
 
-func createAccounts() {
+func createAccounts(mnemonic string, count int) []accounts.Account {
 	var err error
-	localWallet, err = hdwallet.NewFromMnemonic(LOCALHOST_MNEMONIC)
+	accounts := make([]accounts.Account, count)
+
+	wallet, err := hdwallet.NewFromMnemonic(mnemonic)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < count; i++ {
 		path := hdwallet.MustParseDerivationPath(fmt.Sprintf("m/44'/60'/0'/0/%d", i))
-		account, err := localWallet.Derive(path, true)
+		account, err := wallet.Derive(path, true)
 		if err != nil {
 			panic(err)
 		}
-		localAccounts = append(localAccounts, account)
+		accounts[i] = account
 	}
+
+	wallet.Close()
+
+	return accounts
 }
