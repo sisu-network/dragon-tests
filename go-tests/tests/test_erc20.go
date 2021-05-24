@@ -79,4 +79,6 @@ func TestErc20(title string) {
 		balance := getBalance(recipient.Address)
 		assert.Equal(big.NewInt(10), balance, "Balance of each recipient is correct")
 	}
+
+	utils.MarkTestPassed(title)
 }
