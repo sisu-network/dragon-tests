@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/davecgh/go-spew v1.1.1
-	github.com/ethereum/go-ethereum v1.10.2
+	github.com/ethereum/go-ethereum v1.10.3
 	github.com/miguelmota/go-ethereum-hdwallet v0.0.1
 	github.com/pmezard/go-difflib v1.0.0
 	golang.org/x/crypto v0.0.0-20210503195802-e9a32991a82e // indirect
