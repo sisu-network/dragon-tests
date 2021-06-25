@@ -1,12 +1,10 @@
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const ethers = require("ethers");
 const fs = require("fs");
-const exec = require("child_process").exec;
 const assert = require("assert").strict;
+require("dotenv").config();
 
-const MNEMONIC =
-  "draft attract behave allow rib raise puzzle frost neck curtain gentle bless letter parrot hold century diet budget paper fetch hat vanish wonder maximum";
-// const MNEMONIC = "ski oppose bird picture token burst drink pear owner turkey hair fiber";
+const MNEMONIC = process.env.MNEMONIC;
 
 const Web3 = require("web3");
 let web3;
@@ -19,7 +17,7 @@ const sleep = function (ms) {
 };
 
 function getProvider() {
-  const url = "HTTP://127.0.0.1:1234";
+  const url = process.env.RPC_ENDPOINT;
 
   return new HDWalletProvider({
     mnemonic: {
@@ -38,6 +36,11 @@ async function deployContract() {
   const contractAbi = getContractAbi("../go-tests/tests/contracts/erc20/ERC20.abi");
   const contractByteCode = fs.readFileSync("../go-tests/tests/contracts/erc20/ERC20.bin", "utf8");
   const contract = new web3.eth.Contract(contractAbi);
+
+  const chainId = await web3.eth.net.getId();
+  console.log("chainId = ", chainId);
+
+  console.log("Deploying contracts.....");
 
   try {
     return await contract
