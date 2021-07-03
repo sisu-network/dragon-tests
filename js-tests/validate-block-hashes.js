@@ -25,10 +25,20 @@ async function getData(ip, blockNumber) {
   return response.data;
 }
 
+async function getLatestBlock() {
+  const ips = process.env.NODE_IPS.split(",");
+  console.log("ips = ", ips);
+
+  const data = await getData(ips[0], "latest");
+  console.log("Block number = ", data.result.number);
+  return data.result.number;
+}
+
 async function check() {
   const ips = process.env.NODE_IPS.split(",");
+  console.log("ips = ", ips);
 
-  for (let k = 2000; k <= 2010; k++) {
+  for (let k = 26900; k <= 26903; k++) {
     const blockNumber = "0x" + decimalToHexString(k);
 
     console.log("k = ", k);
@@ -51,12 +61,10 @@ async function check() {
 
     console.log("Data is correct");
   }
-
-  // const latest = await getData("44.193.169.123", "latest");
-  // // const blockNumber = latest.result.number;
 }
 
 async function run() {
+  // await getLatestBlock();
   await check();
 }
 
