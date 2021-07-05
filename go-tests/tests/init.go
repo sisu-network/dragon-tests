@@ -20,6 +20,7 @@ var (
 func init() {
 	var err error
 	client, err = ethclient.Dial("http://localhost:1234")
+	// client, err = ethclient.Dial("https://rpc.talon-1.network")
 	if err != nil {
 		panic(err)
 	}
@@ -27,6 +28,7 @@ func init() {
 	fmt.Println("Creating an account....")
 	localWallet, err = hdwallet.NewFromMnemonic(LOCALHOST_MNEMONIC)
 	defaultAccounts = createAccounts(LOCALHOST_MNEMONIC, 10)
+	fmt.Println("defaultAccounts = ", defaultAccounts)
 	fmt.Println("Done Creating an account....")
 }
 

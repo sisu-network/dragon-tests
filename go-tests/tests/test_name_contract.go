@@ -13,6 +13,7 @@ import (
 
 var (
 	chainId = big.NewInt(1)
+	// chainId = big.NewInt(34567) // Testnet chain id
 )
 
 func TestChangeName(title string) {

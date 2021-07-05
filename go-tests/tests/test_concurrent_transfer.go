@@ -33,7 +33,7 @@ func testConcurrentTransfer(title string) {
 
 	wg.Wait()
 
-	time.Sleep(time.Second * 1) // Wait for block finality
+	time.Sleep(time.Second * 6) // Wait for block finality
 	afterBalance, err := client.BalanceAt(context.Background(), recipient.Address, nil)
 	if err != nil {
 		panic(err)

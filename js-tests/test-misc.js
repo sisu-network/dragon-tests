@@ -18,6 +18,7 @@ const sleep = function (ms) {
 
 function getProvider() {
   const url = process.env.RPC_ENDPOINT;
+  console.log("url = ", url);
 
   return new HDWalletProvider({
     mnemonic: {
